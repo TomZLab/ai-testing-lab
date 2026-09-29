@@ -18,6 +18,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LoginPageTest {
+    private static final String BASE_URL = "https://www.saucedemo.com/";
+    private static final Duration WAIT_TIMEOUT = Duration.ofSeconds(10);
+
     private WebDriver driver;
 
     @BeforeEach
@@ -36,10 +39,67 @@ class LoginPageTest {
     }
 
     @Test
-    void loginPageDisplaysRequiredElements() {
-        driver.get("https://www.saucedemo.com/");
+    void validUserCanLogIn() {
+        logIn("standard_user", "secret_sauce");
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebDriverWait wait = new WebDriverWait(driver, WAIT_TIMEOUT);
+        wait.until(ExpectedConditions.urlToBe(BASE_URL + "inventory.html"));
+        WebElement title = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("title")));
+        WebElement inventoryItem = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.cssSelector(".inventory_list .inventory_item")));
+
+        assertAll("Successful login",
+                () -> assertEquals("Products", title.getText(), "Inventory page heading"),
+                () -> assertTrue(inventoryItem.isDisplayed(), "At least one inventory item should be visible"));
+    }
+
+    @Test
+    void invalidPasswordShowsError() {
+        logIn("standard_user", "invalid_password");
+
+        assertLoginError("Epic sadface: Username and password do not match any user in this service");
+    }
+
+    @Test
+    void emptyUsernameShowsError() {
+        logIn("", "secret_sauce");
+
+        assertLoginError("Epic sadface: Username is required");
+    }
+
+    @Test
+    void emptyPasswordShowsError() {
+        logIn("standard_user", "");
+
+        assertLoginError("Epic sadface: Password is required");
+    }
+
+    private void logIn(String username, String password) {
+        driver.get(BASE_URL);
+
+        WebDriverWait wait = new WebDriverWait(driver, WAIT_TIMEOUT);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("user-name"))).sendKeys(username);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("password"))).sendKeys(password);
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("login-button"))).click();
+    }
+
+    private void assertLoginError(String expectedMessage) {
+        WebDriverWait wait = new WebDriverWait(driver, WAIT_TIMEOUT);
+        WebElement error = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[data-test='error']")));
+
+        assertAll("Rejected login",
+                () -> assertEquals(expectedMessage, error.getText(), "Login error message"),
+                () -> assertEquals(BASE_URL, driver.getCurrentUrl(),
+                        "User should remain on the login page"),
+                () -> assertTrue(driver.findElement(By.id("login-button")).isDisplayed(),
+                        "Login form should remain visible"));
+    }
+
+    @Test
+    void loginPageDisplaysRequiredElements() {
+        driver.get(BASE_URL);
+
+        WebDriverWait wait = new WebDriverWait(driver, WAIT_TIMEOUT);
         WebElement logo = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("login_logo")));
         WebElement username = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("user-name")));
         WebElement password = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("password")));
