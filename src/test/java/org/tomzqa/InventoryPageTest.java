@@ -10,9 +10,7 @@ import org.tomzqa.pages.InventoryPage;
 import org.tomzqa.pages.LoginPage;
 import org.tomzqa.pages.ProductDetailsPage;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class InventoryPageTest extends BaseTest {
     private InventoryPage inventoryPage;
@@ -50,7 +48,7 @@ class InventoryPageTest extends BaseTest {
         assertAll("Name ascending",
                 () -> assertEquals(6, descendingNames.size()),
                 () -> assertEquals(expectedDescendingNames, descendingNames, "Setup should be sorted descending"),
-                () -> assertTrue(!descendingNames.equals(expectedAscendingNames),
+                () -> assertFalse(descendingNames.equals(expectedAscendingNames),
                         "Descending setup should differ from ascending order"),
                 () -> assertEquals(expectedAscendingNames, actualAscendingNames, "Products should be sorted ascending"));
     }
@@ -68,8 +66,7 @@ class InventoryPageTest extends BaseTest {
         assertAll("Name descending",
                 () -> assertEquals(6, ascendingNames.size()),
                 () -> assertEquals(expectedAscendingNames, ascendingNames, "Setup should be sorted ascending"),
-                () -> assertTrue(!ascendingNames.equals(expectedDescendingNames),
-                        "Ascending setup should differ from descending order"),
+                () -> assertFalse(ascendingNames.equals(expectedDescendingNames), "Ascending setup should differ from descending order"),
                 () -> assertEquals(expectedDescendingNames, actualDescendingNames, "Products should be sorted descending"));
     }
 
