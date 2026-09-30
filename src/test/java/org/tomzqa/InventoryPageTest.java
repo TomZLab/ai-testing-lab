@@ -1,0 +1,142 @@
+package org.tomzqa;
+
+import java.math.BigDecimal;
+import java.util.Comparator;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.tomzqa.pages.InventoryPage;
+import org.tomzqa.pages.LoginPage;
+import org.tomzqa.pages.ProductDetailsPage;
+
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class InventoryPageTest extends BaseTest {
+    private InventoryPage inventoryPage;
+
+    @BeforeEach
+    void logIn() {
+        LoginPage loginPage = new LoginPage(driver);
+        loginPage.open();
+        loginPage.logIn("standard_user", "secret_sauce");
+        inventoryPage = new InventoryPage(driver);
+        inventoryPage.waitUntilLoaded();
+    }
+
+    @Test
+    void inventoryDisplaysProductsAndPrices() {
+        assertAll("Inventory",
+                () -> assertEquals("Products", inventoryPage.getHeading()),
+                () -> assertEquals(6, inventoryPage.getProductNames().size(), "Expected demo product count"),
+                () -> assertTrue(inventoryPage.getProductNames().contains("Sauce Labs Backpack")),
+                () -> assertEquals(6, inventoryPage.getProductPrices().size()),
+                () -> assertTrue(inventoryPage.getProductPrices().stream().allMatch(price -> price.signum() > 0)),
+                () -> assertEquals(0, inventoryPage.getCartCount(), "Cart should start empty"));
+    }
+
+    @Test
+    void productsCanBeSortedByNameAscending() {
+        inventoryPage.sortByNameDescending();
+        List<String> descendingNames = inventoryPage.getProductNames();
+        List<String> expectedDescendingNames = descendingNames.stream().sorted(Comparator.reverseOrder()).toList();
+        List<String> expectedAscendingNames = descendingNames.stream().sorted().toList();
+
+        inventoryPage.sortByNameAscending();
+        List<String> actualAscendingNames = inventoryPage.getProductNames();
+
+        assertAll("Name ascending",
+                () -> assertEquals(6, descendingNames.size()),
+                () -> assertEquals(expectedDescendingNames, descendingNames, "Setup should be sorted descending"),
+                () -> assertTrue(!descendingNames.equals(expectedAscendingNames),
+                        "Descending setup should differ from ascending order"),
+                () -> assertEquals(expectedAscendingNames, actualAscendingNames, "Products should be sorted ascending"));
+    }
+
+    @Test
+    void productsCanBeSortedByNameDescending() {
+        inventoryPage.sortByNameAscending();
+        List<String> ascendingNames = inventoryPage.getProductNames();
+        List<String> expectedAscendingNames = ascendingNames.stream().sorted().toList();
+        List<String> expectedDescendingNames = ascendingNames.stream().sorted(Comparator.reverseOrder()).toList();
+
+        inventoryPage.sortByNameDescending();
+        List<String> actualDescendingNames = inventoryPage.getProductNames();
+
+        assertAll("Name descending",
+                () -> assertEquals(6, ascendingNames.size()),
+                () -> assertEquals(expectedAscendingNames, ascendingNames, "Setup should be sorted ascending"),
+                () -> assertTrue(!ascendingNames.equals(expectedDescendingNames),
+                        "Ascending setup should differ from descending order"),
+                () -> assertEquals(expectedDescendingNames, actualDescendingNames, "Products should be sorted descending"));
+    }
+
+    @Test
+    void productsCanBeSortedByPriceAscending() {
+        List<BigDecimal> prices = inventoryPage.getProductPrices();
+        List<BigDecimal> expectedPrices = prices.stream().sorted().toList();
+
+        inventoryPage.sortByPriceAscending();
+
+        assertAll("Price ascending",
+                () -> assertEquals(6, prices.size()),
+                () -> assertEquals(expectedPrices, inventoryPage.getProductPrices()));
+    }
+
+    @Test
+    void productsCanBeSortedByPriceDescending() {
+        List<BigDecimal> prices = inventoryPage.getProductPrices();
+        List<BigDecimal> expectedPrices = prices.stream().sorted(Comparator.reverseOrder()).toList();
+
+        inventoryPage.sortByPriceDescending();
+
+        assertAll("Price descending",
+                () -> assertEquals(6, prices.size()),
+                () -> assertEquals(expectedPrices, inventoryPage.getProductPrices()));
+    }
+
+    @Test
+    void productCanBeAddedToCart() {
+        int initialCartCount = inventoryPage.getCartCount();
+
+        inventoryPage.addBackpackToCart();
+
+        assertAll("Product added",
+                () -> assertEquals(0, initialCartCount, "Cart should start empty"),
+                () -> assertEquals(1, inventoryPage.getCartCount(), "Cart count after adding"),
+                () -> assertTrue(inventoryPage.canRemoveBackpack(), "Remove button after adding"));
+    }
+
+    @Test
+    void productCanBeRemovedFromCart() {
+        inventoryPage.addBackpackToCart();
+        int initialCartCount = inventoryPage.getCartCount();
+
+        inventoryPage.removeBackpackFromCart();
+
+        assertAll("Product removed",
+                () -> assertEquals(1, initialCartCount, "Cart should contain the backpack before removal"),
+                () -> assertEquals(0, inventoryPage.getCartCount(), "Cart count after removing"),
+                () -> assertTrue(inventoryPage.canAddBackpack(), "Add button after removing"));
+    }
+
+    @Test
+    void productDetailsCanBeOpened() {
+        ProductDetailsPage detailsPage = inventoryPage.openBackpack();
+
+        assertEquals("Sauce Labs Backpack", detailsPage.getProductName(), "Product details name");
+    }
+
+    @Test
+    void productDetailsCanReturnToInventory() {
+        ProductDetailsPage detailsPage = inventoryPage.openBackpack();
+
+        inventoryPage = detailsPage.backToProducts();
+
+        assertAll("Return to inventory",
+                () -> assertEquals("Products", inventoryPage.getHeading()),
+                () -> assertTrue(inventoryPage.hasVisibleItem()));
+    }
+}
