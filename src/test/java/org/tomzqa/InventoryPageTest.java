@@ -48,8 +48,7 @@ class InventoryPageTest extends BaseTest {
         assertAll("Name ascending",
                 () -> assertEquals(6, descendingNames.size()),
                 () -> assertEquals(expectedDescendingNames, descendingNames, "Setup should be sorted descending"),
-                () -> assertFalse(descendingNames.equals(expectedAscendingNames),
-                        "Descending setup should differ from ascending order"),
+                () -> assertNotEquals(descendingNames, expectedAscendingNames, "Descending setup should differ from ascending order"),
                 () -> assertEquals(expectedAscendingNames, actualAscendingNames, "Products should be sorted ascending"));
     }
 
@@ -66,7 +65,7 @@ class InventoryPageTest extends BaseTest {
         assertAll("Name descending",
                 () -> assertEquals(6, ascendingNames.size()),
                 () -> assertEquals(expectedAscendingNames, ascendingNames, "Setup should be sorted ascending"),
-                () -> assertFalse(ascendingNames.equals(expectedDescendingNames), "Ascending setup should differ from descending order"),
+                () -> assertNotEquals(ascendingNames, expectedDescendingNames, "Ascending setup should differ from descending order"),
                 () -> assertEquals(expectedDescendingNames, actualDescendingNames, "Products should be sorted descending"));
     }
 
@@ -96,27 +95,29 @@ class InventoryPageTest extends BaseTest {
 
     @Test
     void productCanBeAddedToCart() {
+        String productName = "Sauce Labs Backpack";
         int initialCartCount = inventoryPage.getCartCount();
 
-        inventoryPage.addBackpackToCart();
+        inventoryPage.addProductToCart(productName);
 
         assertAll("Product added",
                 () -> assertEquals(0, initialCartCount, "Cart should start empty"),
                 () -> assertEquals(1, inventoryPage.getCartCount(), "Cart count after adding"),
-                () -> assertTrue(inventoryPage.canRemoveBackpack(), "Remove button after adding"));
+                () -> assertTrue(inventoryPage.canRemoveProduct(productName), "Remove button after adding"));
     }
 
     @Test
     void productCanBeRemovedFromCart() {
-        inventoryPage.addBackpackToCart();
+        String productName = "Test.allTheThings() T-Shirt (Red)";
+        inventoryPage.addProductToCart(productName);
         int initialCartCount = inventoryPage.getCartCount();
 
-        inventoryPage.removeBackpackFromCart();
+        inventoryPage.removeProductFromCart(productName);
 
         assertAll("Product removed",
-                () -> assertEquals(1, initialCartCount, "Cart should contain the backpack before removal"),
+                () -> assertEquals(1, initialCartCount, "Cart should contain the product before removal"),
                 () -> assertEquals(0, inventoryPage.getCartCount(), "Cart count after removing"),
-                () -> assertTrue(inventoryPage.canAddBackpack(), "Add button after removing"));
+                () -> assertTrue(inventoryPage.canAddProduct(productName), "Add button after removing"));
     }
 
     @Test

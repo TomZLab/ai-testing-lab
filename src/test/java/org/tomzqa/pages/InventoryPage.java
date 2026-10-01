@@ -7,12 +7,11 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Quotes;
 import org.openqa.selenium.support.ui.Select;
 
 public class InventoryPage extends BasePage {
     private final By items = By.cssSelector(".inventory_list .inventory_item");
-    private final By addBackpackButton = By.id("add-to-cart-sauce-labs-backpack");
-    private final By removeBackpackButton = By.id("remove-sauce-labs-backpack");
 
     public InventoryPage(WebDriver driver) {
         super(driver);
@@ -61,14 +60,25 @@ public class InventoryPage extends BasePage {
                 By.cssSelector("[data-test='product-sort-container']")))).selectByValue(value);
     }
 
-    public void addBackpackToCart() {
-        wait.until(ExpectedConditions.elementToBeClickable(addBackpackButton)).click();
-        wait.until(ExpectedConditions.elementToBeClickable(removeBackpackButton));
+    public void addProductToCart(String productName) {
+        waitForProductButton(productName, "Add to cart").click();
+        waitForProductButton(productName, "Remove");
     }
 
-    public void removeBackpackFromCart() {
-        wait.until(ExpectedConditions.elementToBeClickable(removeBackpackButton)).click();
-        wait.until(ExpectedConditions.elementToBeClickable(addBackpackButton));
+    public void removeProductFromCart(String productName) {
+        waitForProductButton(productName, "Remove").click();
+        waitForProductButton(productName, "Add to cart");
+    }
+
+    private WebElement waitForProductButton(String productName, String buttonText) {
+        return wait.until(ExpectedConditions.refreshed(
+                ExpectedConditions.elementToBeClickable(findProductButton(productName, buttonText))));
+    }
+
+    private By findProductButton(String productName, String buttonText) {
+        return By.xpath("//*[@data-test='inventory-item']"
+                + "[.//*[@data-test='inventory-item-name' and normalize-space(.)=" + Quotes.escape(productName) + "]]"
+                + "//button[normalize-space(.)=" + Quotes.escape(buttonText) + "]");
     }
 
     public int getCartCount() {
@@ -76,14 +86,12 @@ public class InventoryPage extends BasePage {
         return badges.isEmpty() ? 0 : Integer.parseInt(badges.getFirst().getText());
     }
 
-    public boolean canRemoveBackpack() {
-        return driver.findElements(removeBackpackButton).stream()
-                .anyMatch(button -> button.isDisplayed() && button.isEnabled());
+    public boolean canRemoveProduct(String productName) {
+        return ExpectedConditions.elementToBeClickable(findProductButton(productName, "Remove")).apply(driver) != null;
     }
 
-    public boolean canAddBackpack() {
-        return driver.findElements(addBackpackButton).stream()
-                .anyMatch(button -> button.isDisplayed() && button.isEnabled());
+    public boolean canAddProduct(String productName) {
+        return ExpectedConditions.elementToBeClickable(findProductButton(productName, "Add to cart")).apply(driver) != null;
     }
 
     public ProductDetailsPage openBackpack() {
