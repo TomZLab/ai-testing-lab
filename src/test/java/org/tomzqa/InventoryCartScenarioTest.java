@@ -1,9 +1,7 @@
 package org.tomzqa;
 
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -14,7 +12,6 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.tomzqa.pages.CartPage;
 import org.tomzqa.pages.InventoryPage;
 import org.tomzqa.pages.LoginPage;
@@ -36,14 +33,7 @@ class InventoryCartScenarioTest {
 
     @BeforeAll
     void openChromeAndLogIn() {
-        Map<String, Object> prefs = new HashMap<>();
-        prefs.put("credentials_enable_service", false);
-        prefs.put("profile.password_manager_enabled", false);
-        prefs.put("profile.password_manager_leak_detection", false);
-        ChromeOptions options = new ChromeOptions();
-        options.setExperimentalOption("prefs", prefs);
-        options.addArguments("--headless=new", "--window-size=1280,800");
-        driver = new ChromeDriver(options);
+        driver = new ChromeDriver(ChromeOptionsHelper.create());
         driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(30));
 
         LoginPage loginPage = new LoginPage(driver);
