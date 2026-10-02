@@ -94,6 +94,13 @@ public class InventoryPage extends BasePage {
         return ExpectedConditions.elementToBeClickable(findProductButton(productName, "Add to cart")).apply(driver) != null;
     }
 
+    public CartPage openCart() {
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[data-test='shopping-cart-link']"))).click();
+        CartPage cartPage = new CartPage(driver);
+        cartPage.waitUntilLoaded();
+        return cartPage;
+    }
+
     public ProductDetailsPage openBackpack() {
         wait.until(ExpectedConditions.elementToBeClickable(By.linkText("Sauce Labs Backpack"))).click();
         ProductDetailsPage detailsPage = new ProductDetailsPage(driver);
