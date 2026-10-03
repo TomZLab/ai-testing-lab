@@ -1,14 +1,15 @@
 package org.tomzqa.pages;
 
-import java.math.BigDecimal;
-import java.util.List;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Quotes;
 import org.openqa.selenium.support.ui.Select;
+import org.tomzqa.TestConfig;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 public class InventoryPage extends BasePage {
     private final By items = By.cssSelector(".inventory_list .inventory_item");
@@ -18,7 +19,7 @@ public class InventoryPage extends BasePage {
     }
 
     public void waitUntilLoaded() {
-        wait.until(ExpectedConditions.urlToBe(LoginPage.BASE_URL + "inventory.html"));
+        wait.until(ExpectedConditions.urlToBe(TestConfig.BASE_URL + "inventory.html"));
         visible(items);
     }
 

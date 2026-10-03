@@ -1,11 +1,12 @@
 package org.tomzqa.pages;
 
-import java.util.List;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.tomzqa.TestConfig;
+
+import java.util.List;
 
 public class CartPage extends BasePage {
     public CartPage(WebDriver driver) {
@@ -13,7 +14,7 @@ public class CartPage extends BasePage {
     }
 
     public void waitUntilLoaded() {
-        wait.until(ExpectedConditions.urlToBe(LoginPage.BASE_URL + "cart.html"));
+        wait.until(ExpectedConditions.urlToBe(TestConfig.BASE_URL + "cart.html"));
         visible(By.className("cart_list"));
     }
 

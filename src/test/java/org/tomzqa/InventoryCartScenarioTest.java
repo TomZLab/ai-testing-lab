@@ -1,24 +1,16 @@
 package org.tomzqa;
 
-import java.time.Duration;
-import java.util.List;
-
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.tomzqa.pages.CartPage;
 import org.tomzqa.pages.InventoryPage;
 import org.tomzqa.pages.LoginPage;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.time.Duration;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 // These steps intentionally share one authenticated browser and cart state.
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -38,7 +30,7 @@ class InventoryCartScenarioTest {
 
         LoginPage loginPage = new LoginPage(driver);
         loginPage.open();
-        loginPage.logIn("standard_user", "secret_sauce");
+        loginPage.logIn(TestConfig.STANDARD_USERNAME, TestConfig.STANDARD_PASSWORD);
         inventoryPage = new InventoryPage(driver);
         inventoryPage.waitUntilLoaded();
     }

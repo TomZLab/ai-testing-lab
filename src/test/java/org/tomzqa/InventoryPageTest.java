@@ -1,14 +1,14 @@
 package org.tomzqa;
 
-import java.math.BigDecimal;
-import java.util.Comparator;
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.tomzqa.pages.InventoryPage;
 import org.tomzqa.pages.LoginPage;
 import org.tomzqa.pages.ProductDetailsPage;
+
+import java.math.BigDecimal;
+import java.util.Comparator;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,7 +19,7 @@ class InventoryPageTest extends BaseTest {
     void logIn() {
         LoginPage loginPage = new LoginPage(driver);
         loginPage.open();
-        loginPage.logIn("standard_user", "secret_sauce");
+        loginPage.logIn(TestConfig.STANDARD_USERNAME, TestConfig.STANDARD_PASSWORD);
         inventoryPage = new InventoryPage(driver);
         inventoryPage.waitUntilLoaded();
     }
