@@ -121,6 +121,23 @@ class InventoryPageTest extends BaseTest {
     }
 
     @Test
+    void removingOneProductKeepsTheOtherInCart() {
+        String removedProduct = "Sauce Labs Backpack";
+        String remainingProduct = "Sauce Labs Bike Light";
+        int initialCartCount = inventoryPage.getCartCount();
+
+        inventoryPage.addProductToCart(removedProduct);
+        inventoryPage.addProductToCart(remainingProduct);
+        inventoryPage.removeProductFromCart(removedProduct);
+
+        assertAll("One product remains in cart",
+                () -> assertEquals(0, initialCartCount, "Cart should start empty"),
+                () -> assertEquals(1, inventoryPage.getCartCount(), "Cart should contain one product"),
+                () -> assertTrue(inventoryPage.canAddProduct(removedProduct), "Removed product can be added again"),
+                () -> assertTrue(inventoryPage.canRemoveProduct(remainingProduct), "Remaining product can still be removed"));
+    }
+
+    @Test
     void productDetailsCanBeOpened() {
         ProductDetailsPage detailsPage = inventoryPage.openBackpack();
 
