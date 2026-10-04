@@ -1,13 +1,8 @@
 package org.tomzqa;
 
-import org.testng.annotations.*;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
+import org.testng.annotations.Test;
 import org.tomzqa.pages.CartPage;
-import org.tomzqa.pages.InventoryPage;
-import org.tomzqa.pages.LoginPage;
 
-import java.time.Duration;
 import java.util.List;
 
 import org.testng.asserts.SoftAssert;
@@ -15,37 +10,10 @@ import org.testng.asserts.SoftAssert;
 import static org.testng.Assert.*;
 
 // These steps intentionally share one authenticated browser and cart state.
-public class InventoryCartScenarioTest implements WebDriverProvider {
+public class InventoryCartScenarioTest extends BaseScenarioTest {
     private static final String FIRST_PRODUCT = "Sauce Labs Backpack";
     private static final String SECOND_PRODUCT = "Sauce Labs Bike Light";
     private static final String THIRD_PRODUCT = "Sauce Labs Bolt T-Shirt";
-
-    private WebDriver driver;
-    private InventoryPage inventoryPage;
-
-    @Override
-    public WebDriver getWebDriver() {
-        return driver;
-    }
-
-    @BeforeClass
-    public void openChromeAndLogIn() {
-        driver = new ChromeDriver(ChromeOptionsHelper.create());
-        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(30));
-
-        LoginPage loginPage = new LoginPage(driver);
-        loginPage.open();
-        loginPage.logIn(TestConfig.STANDARD_USERNAME, TestConfig.STANDARD_PASSWORD);
-        inventoryPage = new InventoryPage(driver);
-        inventoryPage.waitUntilLoaded();
-    }
-
-    @AfterClass(alwaysRun = true)
-    public void closeChrome() {
-        if (driver != null) {
-            driver.quit();
-        }
-    }
 
     @Test
     public void addFirstProduct() {
