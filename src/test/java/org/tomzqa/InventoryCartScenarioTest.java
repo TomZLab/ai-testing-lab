@@ -15,13 +15,18 @@ import org.testng.asserts.SoftAssert;
 import static org.testng.Assert.*;
 
 // These steps intentionally share one authenticated browser and cart state.
-public class InventoryCartScenarioTest {
+public class InventoryCartScenarioTest implements WebDriverProvider {
     private static final String FIRST_PRODUCT = "Sauce Labs Backpack";
     private static final String SECOND_PRODUCT = "Sauce Labs Bike Light";
     private static final String THIRD_PRODUCT = "Sauce Labs Bolt T-Shirt";
 
     private WebDriver driver;
     private InventoryPage inventoryPage;
+
+    @Override
+    public WebDriver getWebDriver() {
+        return driver;
+    }
 
     @BeforeClass
     public void openChromeAndLogIn() {

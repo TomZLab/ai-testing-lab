@@ -7,8 +7,13 @@ import org.testng.annotations.BeforeMethod;
 
 import java.time.Duration;
 
-public abstract class BaseTest {
+public abstract class BaseTest implements WebDriverProvider {
     protected WebDriver driver;
+
+    @Override
+    public WebDriver getWebDriver() {
+        return driver;
+    }
 
     @BeforeMethod
     public void openChrome() {
