@@ -1,6 +1,6 @@
 package org.tomzqa;
 
-import org.junit.jupiter.api.*;
+import org.testng.annotations.*;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.tomzqa.pages.CartPage;
@@ -10,12 +10,12 @@ import org.tomzqa.pages.LoginPage;
 import java.time.Duration;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.testng.asserts.SoftAssert;
+
+import static org.testng.Assert.*;
 
 // These steps intentionally share one authenticated browser and cart state.
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class InventoryCartScenarioTest {
+public class InventoryCartScenarioTest {
     private static final String FIRST_PRODUCT = "Sauce Labs Backpack";
     private static final String SECOND_PRODUCT = "Sauce Labs Bike Light";
     private static final String THIRD_PRODUCT = "Sauce Labs Bolt T-Shirt";
@@ -23,8 +23,8 @@ class InventoryCartScenarioTest {
     private WebDriver driver;
     private InventoryPage inventoryPage;
 
-    @BeforeAll
-    void openChromeAndLogIn() {
+    @BeforeClass
+    public void openChromeAndLogIn() {
         driver = new ChromeDriver(ChromeOptionsHelper.create());
         driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(30));
 
@@ -35,47 +35,44 @@ class InventoryCartScenarioTest {
         inventoryPage.waitUntilLoaded();
     }
 
-    @AfterAll
-    void closeChrome() {
+    @AfterClass(alwaysRun = true)
+    public void closeChrome() {
         if (driver != null) {
             driver.quit();
         }
     }
 
     @Test
-    @Order(1)
-    void addFirstProduct() {
+    public void addFirstProduct() {
         inventoryPage.addProductToCart(FIRST_PRODUCT);
 
-        assertEquals(1, inventoryPage.getCartCount(), "Cart should contain the first product");
+        assertEquals(inventoryPage.getCartCount(), 1, "Cart should contain the first product");
     }
 
-    @Test
-    @Order(2)
-    void addSecondAndThirdProducts() {
+    @Test(dependsOnMethods = "addFirstProduct")
+    public void addSecondAndThirdProducts() {
         inventoryPage.addProductToCart(SECOND_PRODUCT);
         inventoryPage.addProductToCart(THIRD_PRODUCT);
 
-        assertEquals(3, inventoryPage.getCartCount(), "Cart should retain all three products");
+        assertEquals(inventoryPage.getCartCount(), 3, "Cart should retain all three products");
     }
 
-    @Test
-    @Order(3)
-    void removeSecondProduct() {
+    @Test(dependsOnMethods = "addSecondAndThirdProducts")
+    public void removeSecondProduct() {
         inventoryPage.removeProductFromCart(SECOND_PRODUCT);
 
-        assertEquals(2, inventoryPage.getCartCount(), "Cart should contain two remaining products");
+        assertEquals(inventoryPage.getCartCount(), 2, "Cart should contain two remaining products");
     }
 
-    @Test
-    @Order(4)
-    void verifyRemainingProductsInCart() {
+    @Test(dependsOnMethods = "removeSecondProduct")
+    public void verifyRemainingProductsInCart() {
         CartPage cartPage = inventoryPage.openCart();
         List<String> productNames = cartPage.getProductNames();
 
-        assertAll("Remaining cart products",
-                () -> assertEquals(2, productNames.size(), "Cart should contain exactly two products"),
-                () -> assertTrue(productNames.contains(FIRST_PRODUCT), "First product should remain"),
-                () -> assertTrue(productNames.contains(THIRD_PRODUCT), "Third product should remain"));
+        SoftAssert softly = new SoftAssert();
+        softly.assertEquals(productNames.size(), 2, "Cart should contain exactly two products");
+        softly.assertTrue(productNames.contains(FIRST_PRODUCT), "First product should remain");
+        softly.assertTrue(productNames.contains(THIRD_PRODUCT), "Third product should remain");
+        softly.assertAll("Remaining cart products");
     }
 }

@@ -1,7 +1,8 @@
 package org.tomzqa;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
 import org.tomzqa.pages.InventoryPage;
 import org.tomzqa.pages.LoginPage;
 import org.tomzqa.pages.ProductDetailsPage;
@@ -10,13 +11,13 @@ import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.testng.Assert.assertEquals;
 
-class InventoryPageTest extends BaseTest {
+public class InventoryPageTest extends BaseTest {
     private InventoryPage inventoryPage;
 
-    @BeforeEach
-    void logIn() {
+    @BeforeMethod
+    public void logIn() {
         LoginPage loginPage = new LoginPage(driver);
         loginPage.open();
         loginPage.logIn(TestConfig.STANDARD_USERNAME, TestConfig.STANDARD_PASSWORD);
@@ -25,18 +26,19 @@ class InventoryPageTest extends BaseTest {
     }
 
     @Test
-    void inventoryDisplaysProductsAndPrices() {
-        assertAll("Inventory",
-                () -> assertEquals("Products", inventoryPage.getHeading()),
-                () -> assertEquals(6, inventoryPage.getProductNames().size(), "Expected demo product count"),
-                () -> assertTrue(inventoryPage.getProductNames().contains("Sauce Labs Backpack")),
-                () -> assertEquals(6, inventoryPage.getProductPrices().size()),
-                () -> assertTrue(inventoryPage.getProductPrices().stream().allMatch(price -> price.signum() > 0)),
-                () -> assertEquals(0, inventoryPage.getCartCount(), "Cart should start empty"));
+    public void inventoryDisplaysProductsAndPrices() {
+        SoftAssert softly = new SoftAssert();
+        softly.assertEquals(inventoryPage.getHeading(), "Products");
+        softly.assertEquals(inventoryPage.getProductNames().size(), 6, "Expected demo product count");
+        softly.assertTrue(inventoryPage.getProductNames().contains("Sauce Labs Backpack"));
+        softly.assertEquals(inventoryPage.getProductPrices().size(), 6);
+        softly.assertTrue(inventoryPage.getProductPrices().stream().allMatch(price -> price.signum() > 0));
+        softly.assertEquals(inventoryPage.getCartCount(), 0, "Cart should start empty");
+        softly.assertAll("Inventory");
     }
 
     @Test
-    void productsCanBeSortedByNameAscending() {
+    public void productsCanBeSortedByNameAscending() {
         inventoryPage.sortByNameDescending();
         List<String> descendingNames = inventoryPage.getProductNames();
         List<String> expectedDescendingNames = descendingNames.stream().sorted(Comparator.reverseOrder()).toList();
@@ -45,15 +47,16 @@ class InventoryPageTest extends BaseTest {
         inventoryPage.sortByNameAscending();
         List<String> actualAscendingNames = inventoryPage.getProductNames();
 
-        assertAll("Name ascending",
-                () -> assertEquals(6, descendingNames.size()),
-                () -> assertEquals(expectedDescendingNames, descendingNames, "Setup should be sorted descending"),
-                () -> assertNotEquals(descendingNames, expectedAscendingNames, "Descending setup should differ from ascending order"),
-                () -> assertEquals(expectedAscendingNames, actualAscendingNames, "Products should be sorted ascending"));
+        SoftAssert softly = new SoftAssert();
+        softly.assertEquals(descendingNames.size(), 6);
+        softly.assertEquals(descendingNames, expectedDescendingNames, "Setup should be sorted descending");
+        softly.assertNotEquals(descendingNames, expectedAscendingNames, "Descending setup should differ from ascending order");
+        softly.assertEquals(actualAscendingNames, expectedAscendingNames, "Products should be sorted ascending");
+        softly.assertAll("Name ascending");
     }
 
     @Test
-    void productsCanBeSortedByNameDescending() {
+    public void productsCanBeSortedByNameDescending() {
         inventoryPage.sortByNameAscending();
         List<String> ascendingNames = inventoryPage.getProductNames();
         List<String> expectedAscendingNames = ascendingNames.stream().sorted().toList();
@@ -62,66 +65,71 @@ class InventoryPageTest extends BaseTest {
         inventoryPage.sortByNameDescending();
         List<String> actualDescendingNames = inventoryPage.getProductNames();
 
-        assertAll("Name descending",
-                () -> assertEquals(6, ascendingNames.size()),
-                () -> assertEquals(expectedAscendingNames, ascendingNames, "Setup should be sorted ascending"),
-                () -> assertNotEquals(ascendingNames, expectedDescendingNames, "Ascending setup should differ from descending order"),
-                () -> assertEquals(expectedDescendingNames, actualDescendingNames, "Products should be sorted descending"));
+        SoftAssert softly = new SoftAssert();
+        softly.assertEquals(ascendingNames.size(), 6);
+        softly.assertEquals(ascendingNames, expectedAscendingNames, "Setup should be sorted ascending");
+        softly.assertNotEquals(ascendingNames, expectedDescendingNames, "Ascending setup should differ from descending order");
+        softly.assertEquals(actualDescendingNames, expectedDescendingNames, "Products should be sorted descending");
+        softly.assertAll("Name descending");
     }
 
     @Test
-    void productsCanBeSortedByPriceAscending() {
+    public void productsCanBeSortedByPriceAscending() {
         List<BigDecimal> prices = inventoryPage.getProductPrices();
         List<BigDecimal> expectedPrices = prices.stream().sorted().toList();
 
         inventoryPage.sortByPriceAscending();
 
-        assertAll("Price ascending",
-                () -> assertEquals(6, prices.size()),
-                () -> assertEquals(expectedPrices, inventoryPage.getProductPrices()));
+        SoftAssert softly = new SoftAssert();
+        softly.assertEquals(prices.size(), 6);
+        softly.assertEquals(inventoryPage.getProductPrices(), expectedPrices);
+        softly.assertAll("Price ascending");
     }
 
     @Test
-    void productsCanBeSortedByPriceDescending() {
+    public void productsCanBeSortedByPriceDescending() {
         List<BigDecimal> prices = inventoryPage.getProductPrices();
         List<BigDecimal> expectedPrices = prices.stream().sorted(Comparator.reverseOrder()).toList();
 
         inventoryPage.sortByPriceDescending();
 
-        assertAll("Price descending",
-                () -> assertEquals(6, prices.size()),
-                () -> assertEquals(expectedPrices, inventoryPage.getProductPrices()));
+        SoftAssert softly = new SoftAssert();
+        softly.assertEquals(prices.size(), 6);
+        softly.assertEquals(inventoryPage.getProductPrices(), expectedPrices);
+        softly.assertAll("Price descending");
     }
 
     @Test
-    void productCanBeAddedToCart() {
+    public void productCanBeAddedToCart() {
         String productName = "Sauce Labs Backpack";
         int initialCartCount = inventoryPage.getCartCount();
 
         inventoryPage.addProductToCart(productName);
 
-        assertAll("Product added",
-                () -> assertEquals(0, initialCartCount, "Cart should start empty"),
-                () -> assertEquals(1, inventoryPage.getCartCount(), "Cart count after adding"),
-                () -> assertTrue(inventoryPage.canRemoveProduct(productName), "Remove button after adding"));
+        SoftAssert softly = new SoftAssert();
+        softly.assertEquals(initialCartCount, 0, "Cart should start empty");
+        softly.assertEquals(inventoryPage.getCartCount(), 1, "Cart count after adding");
+        softly.assertTrue(inventoryPage.canRemoveProduct(productName), "Remove button after adding");
+        softly.assertAll("Product added");
     }
 
     @Test
-    void productCanBeRemovedFromCart() {
+    public void productCanBeRemovedFromCart() {
         String productName = "Test.allTheThings() T-Shirt (Red)";
         inventoryPage.addProductToCart(productName);
         int initialCartCount = inventoryPage.getCartCount();
 
         inventoryPage.removeProductFromCart(productName);
 
-        assertAll("Product removed",
-                () -> assertEquals(1, initialCartCount, "Cart should contain the product before removal"),
-                () -> assertEquals(0, inventoryPage.getCartCount(), "Cart count after removing"),
-                () -> assertTrue(inventoryPage.canAddProduct(productName), "Add button after removing"));
+        SoftAssert softly = new SoftAssert();
+        softly.assertEquals(initialCartCount, 1, "Cart should contain the product before removal");
+        softly.assertEquals(inventoryPage.getCartCount(), 0, "Cart count after removing");
+        softly.assertTrue(inventoryPage.canAddProduct(productName), "Add button after removing");
+        softly.assertAll("Product removed");
     }
 
     @Test
-    void removingOneProductKeepsTheOtherInCart() {
+    public void removingOneProductKeepsTheOtherInCart() {
         String removedProduct = "Sauce Labs Backpack";
         String remainingProduct = "Sauce Labs Bike Light";
         int initialCartCount = inventoryPage.getCartCount();
@@ -130,28 +138,30 @@ class InventoryPageTest extends BaseTest {
         inventoryPage.addProductToCart(remainingProduct);
         inventoryPage.removeProductFromCart(removedProduct);
 
-        assertAll("One product remains in cart",
-                () -> assertEquals(0, initialCartCount, "Cart should start empty"),
-                () -> assertEquals(1, inventoryPage.getCartCount(), "Cart should contain one product"),
-                () -> assertTrue(inventoryPage.canAddProduct(removedProduct), "Removed product can be added again"),
-                () -> assertTrue(inventoryPage.canRemoveProduct(remainingProduct), "Remaining product can still be removed"));
+        SoftAssert softly = new SoftAssert();
+        softly.assertEquals(initialCartCount, 0, "Cart should start empty");
+        softly.assertEquals(inventoryPage.getCartCount(), 1, "Cart should contain one product");
+        softly.assertTrue(inventoryPage.canAddProduct(removedProduct), "Removed product can be added again");
+        softly.assertTrue(inventoryPage.canRemoveProduct(remainingProduct), "Remaining product can still be removed");
+        softly.assertAll("One product remains in cart");
     }
 
     @Test
-    void productDetailsCanBeOpened() {
+    public void productDetailsCanBeOpened() {
         ProductDetailsPage detailsPage = inventoryPage.openBackpack();
 
-        assertEquals("Sauce Labs Backpack", detailsPage.getProductName(), "Product details name");
+        assertEquals(detailsPage.getProductName(), "Sauce Labs Backpack", "Product details name");
     }
 
     @Test
-    void productDetailsCanReturnToInventory() {
+    public void productDetailsCanReturnToInventory() {
         ProductDetailsPage detailsPage = inventoryPage.openBackpack();
 
         inventoryPage = detailsPage.backToProducts();
 
-        assertAll("Return to inventory",
-                () -> assertEquals("Products", inventoryPage.getHeading()),
-                () -> assertTrue(inventoryPage.hasVisibleItem()));
+        SoftAssert softly = new SoftAssert();
+        softly.assertEquals(inventoryPage.getHeading(), "Products");
+        softly.assertTrue(inventoryPage.hasVisibleItem());
+        softly.assertAll("Return to inventory");
     }
 }
