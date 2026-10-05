@@ -1,9 +1,9 @@
-package org.tomzqa;
+package org.tomzqa.support;
+
+import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.openqa.selenium.chrome.ChromeOptions;
 
 final class ChromeOptionsHelper {
     private ChromeOptionsHelper() {

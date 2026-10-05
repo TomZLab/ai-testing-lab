@@ -1,8 +1,9 @@
-package org.tomzqa;
+package org.tomzqa.tests.scenarios;
 
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 import org.tomzqa.pages.ProductDetailsPage;
+import org.tomzqa.support.BaseScenarioTest;
 
 import java.util.List;
 

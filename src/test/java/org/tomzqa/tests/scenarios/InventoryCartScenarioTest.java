@@ -1,13 +1,13 @@
-package org.tomzqa;
+package org.tomzqa.tests.scenarios;
 
 import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
 import org.tomzqa.pages.CartPage;
+import org.tomzqa.support.BaseScenarioTest;
 
 import java.util.List;
 
-import org.testng.asserts.SoftAssert;
-
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
 
 // These steps intentionally share one authenticated browser and cart state.
 public class InventoryCartScenarioTest extends BaseScenarioTest {

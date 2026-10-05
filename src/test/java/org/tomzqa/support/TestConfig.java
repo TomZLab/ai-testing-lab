@@ -1,4 +1,4 @@
-package org.tomzqa;
+package org.tomzqa.support;
 
 public final class TestConfig {
     public static final String BASE_URL = "https://www.saucedemo.com/";

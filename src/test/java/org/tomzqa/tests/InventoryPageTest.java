@@ -1,4 +1,4 @@
-package org.tomzqa;
+package org.tomzqa.tests;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -6,6 +6,8 @@ import org.testng.asserts.SoftAssert;
 import org.tomzqa.pages.InventoryPage;
 import org.tomzqa.pages.LoginPage;
 import org.tomzqa.pages.ProductDetailsPage;
+import org.tomzqa.support.BaseTest;
+import org.tomzqa.support.TestConfig;
 
 import java.math.BigDecimal;
 import java.util.Comparator;
