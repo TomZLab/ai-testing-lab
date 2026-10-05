@@ -1,12 +1,19 @@
-package org.tomzqa;
+package org.tomzqa.tests.scenarios;
 
-import org.junit.jupiter.api.*;
+import org.tomzqa.support.BaseScenarioTest;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.tomzqa.pages.CartPage;
 import org.tomzqa.pages.InventoryPage;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 // These steps intentionally share one authenticated browser and cart state.
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)

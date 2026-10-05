@@ -6,7 +6,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Quotes;
 import org.openqa.selenium.support.ui.Select;
-import org.tomzqa.TestConfig;
+import org.tomzqa.support.TestConfig;
 
 import java.math.BigDecimal;
 import java.util.List;

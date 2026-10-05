@@ -1,4 +1,4 @@
-package org.tomzqa;
+package org.tomzqa.support;
 
 import java.time.Duration;
 
@@ -9,7 +9,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 
 @ExtendWith(AllureFailureExtension.class)
-abstract class BaseTest implements WebDriverProvider {
+public abstract class BaseTest implements WebDriverProvider {
     protected WebDriver driver;
 
     @Override
@@ -18,13 +18,13 @@ abstract class BaseTest implements WebDriverProvider {
     }
 
     @BeforeEach
-    void openChrome() {
+    protected void openChrome() {
         driver = new ChromeDriver(ChromeOptionsHelper.create());
         driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(30));
     }
 
     @AfterEach
-    void closeChrome() {
+    protected void closeChrome() {
         if (driver != null) {
             driver.quit();
         }

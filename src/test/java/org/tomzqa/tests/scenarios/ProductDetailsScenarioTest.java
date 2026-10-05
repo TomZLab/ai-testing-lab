@@ -1,5 +1,6 @@
-package org.tomzqa;
+package org.tomzqa.tests.scenarios;
 
+import org.tomzqa.support.BaseScenarioTest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;

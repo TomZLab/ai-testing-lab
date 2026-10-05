@@ -1,4 +1,4 @@
-package org.tomzqa;
+package org.tomzqa.support;
 
 import io.qameta.allure.Allure;
 import io.qameta.allure.AttachmentOptions;

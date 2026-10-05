@@ -1,4 +1,4 @@
-package org.tomzqa;
+package org.tomzqa.support;
 
 import java.util.HashMap;
 import java.util.Map;

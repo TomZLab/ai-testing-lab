@@ -1,4 +1,4 @@
-package org.tomzqa;
+package org.tomzqa.support;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -12,7 +12,7 @@ import java.time.Duration;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(AllureFailureExtension.class)
-abstract class BaseScenarioTest implements WebDriverProvider {
+public abstract class BaseScenarioTest implements WebDriverProvider {
     private WebDriver driver;
 
     @Override
@@ -21,7 +21,7 @@ abstract class BaseScenarioTest implements WebDriverProvider {
     }
 
     @BeforeAll
-    void openChromeAndLogIn() {
+    protected void openChromeAndLogIn() {
         driver = new ChromeDriver(ChromeOptionsHelper.create());
         driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(30));
 
@@ -31,7 +31,7 @@ abstract class BaseScenarioTest implements WebDriverProvider {
     }
 
     @AfterAll
-    void closeChrome() {
+    protected void closeChrome() {
         if (driver != null) {
             try {
                 driver.quit();

@@ -1,5 +1,7 @@
-package org.tomzqa;
+package org.tomzqa.tests;
 
+import org.tomzqa.support.BaseTest;
+import org.tomzqa.support.TestConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.tomzqa.pages.InventoryPage;
@@ -10,7 +12,10 @@ import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class InventoryPageTest extends BaseTest {
     private InventoryPage inventoryPage;
