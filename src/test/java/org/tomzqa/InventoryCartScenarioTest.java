@@ -1,6 +1,7 @@
 package org.tomzqa;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.tomzqa.pages.CartPage;
@@ -15,13 +16,19 @@ import static org.junit.jupiter.api.Assertions.*;
 // These steps intentionally share one authenticated browser and cart state.
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class InventoryCartScenarioTest {
+@ExtendWith(AllureFailureExtension.class)
+class InventoryCartScenarioTest implements WebDriverProvider {
     private static final String FIRST_PRODUCT = "Sauce Labs Backpack";
     private static final String SECOND_PRODUCT = "Sauce Labs Bike Light";
     private static final String THIRD_PRODUCT = "Sauce Labs Bolt T-Shirt";
 
     private WebDriver driver;
     private InventoryPage inventoryPage;
+
+    @Override
+    public WebDriver getWebDriver() {
+        return driver;
+    }
 
     @BeforeAll
     void openChromeAndLogIn() {
