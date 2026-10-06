@@ -6,6 +6,8 @@ import org.testng.annotations.Test;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.instanceOf;
 
 public class PetApiTest {
@@ -20,6 +22,7 @@ public class PetApiTest {
         .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("", instanceOf(List.class));
+                .body("", instanceOf(List.class))
+                .body("status", everyItem(equalTo("available")));
     }
 }
