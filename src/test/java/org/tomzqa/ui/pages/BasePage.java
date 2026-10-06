@@ -1,4 +1,4 @@
-package org.tomzqa.pages;
+package org.tomzqa.ui.pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;

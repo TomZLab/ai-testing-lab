@@ -1,9 +1,11 @@
-package org.tomzqa.tests.scenarios;
+package org.tomzqa.ui.tests.scenarios;
 
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
-import org.tomzqa.pages.ProductDetailsPage;
-import org.tomzqa.support.BaseScenarioTest;
+import org.tomzqa.ui.pages.InventoryPage;
+import org.tomzqa.ui.pages.ProductDetailsPage;
+import org.tomzqa.ui.support.BaseScenarioTest;
 
 import java.util.List;
 
@@ -11,7 +13,14 @@ import static org.testng.Assert.assertEquals;
 
 // These steps intentionally share one authenticated browser and navigation state.
 public class ProductDetailsScenarioTest extends BaseScenarioTest {
+    private InventoryPage inventoryPage;
     private ProductDetailsPage detailsPage;
+
+    @BeforeClass
+    public void initializeInventoryPage() {
+        inventoryPage = new InventoryPage(getWebDriver());
+        inventoryPage.waitUntilLoaded();
+    }
 
     @Test
     public void openBackpackDetails() {

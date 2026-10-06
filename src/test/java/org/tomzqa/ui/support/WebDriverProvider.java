@@ -1,4 +1,4 @@
-package org.tomzqa.support;
+package org.tomzqa.ui.support;
 
 import org.openqa.selenium.WebDriver;
 

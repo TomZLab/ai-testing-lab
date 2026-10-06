@@ -1,9 +1,11 @@
-package org.tomzqa.tests.scenarios;
+package org.tomzqa.ui.tests.scenarios;
 
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
-import org.tomzqa.pages.CartPage;
-import org.tomzqa.support.BaseScenarioTest;
+import org.tomzqa.ui.pages.CartPage;
+import org.tomzqa.ui.pages.InventoryPage;
+import org.tomzqa.ui.support.BaseScenarioTest;
 
 import java.util.List;
 
@@ -14,6 +16,14 @@ public class InventoryCartScenarioTest extends BaseScenarioTest {
     private static final String FIRST_PRODUCT = "Sauce Labs Backpack";
     private static final String SECOND_PRODUCT = "Sauce Labs Bike Light";
     private static final String THIRD_PRODUCT = "Sauce Labs Bolt T-Shirt";
+
+    private InventoryPage inventoryPage;
+
+    @BeforeClass
+    public void initializeInventoryPage() {
+        inventoryPage = new InventoryPage(getWebDriver());
+        inventoryPage.waitUntilLoaded();
+    }
 
     @Test
     public void addFirstProduct() {

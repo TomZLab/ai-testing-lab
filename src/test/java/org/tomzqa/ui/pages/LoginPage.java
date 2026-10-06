@@ -1,10 +1,10 @@
-package org.tomzqa.pages;
+package org.tomzqa.ui.pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.tomzqa.support.TestConfig;
+import org.tomzqa.ui.support.TestConfig;
 
 public class LoginPage extends BasePage {
     public LoginPage(WebDriver driver) {

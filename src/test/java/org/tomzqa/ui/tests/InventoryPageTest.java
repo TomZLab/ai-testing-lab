@@ -1,13 +1,13 @@
-package org.tomzqa.tests;
+package org.tomzqa.ui.tests;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
-import org.tomzqa.pages.InventoryPage;
-import org.tomzqa.pages.LoginPage;
-import org.tomzqa.pages.ProductDetailsPage;
-import org.tomzqa.support.BaseTest;
-import org.tomzqa.support.TestConfig;
+import org.tomzqa.ui.pages.InventoryPage;
+import org.tomzqa.ui.pages.LoginPage;
+import org.tomzqa.ui.pages.ProductDetailsPage;
+import org.tomzqa.ui.support.BaseTest;
+import org.tomzqa.ui.support.TestConfig;
 
 import java.math.BigDecimal;
 import java.util.Comparator;

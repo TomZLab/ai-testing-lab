@@ -1,4 +1,4 @@
-package org.tomzqa.pages;
+package org.tomzqa.ui.pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -6,7 +6,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Quotes;
 import org.openqa.selenium.support.ui.Select;
-import org.tomzqa.support.TestConfig;
+import org.tomzqa.ui.support.TestConfig;
 
 import java.math.BigDecimal;
 import java.util.List;
