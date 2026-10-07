@@ -14,12 +14,12 @@ public class PetApiTest {
     @Test
     public void availablePetsCanBeRetrieved() {
         given()
-                .baseUri("https://petstore3.swagger.io/api/v3")
+                .baseUri("http://localhost:8080/api/v3")
                 .accept(ContentType.JSON)
                 .queryParam("status", "available")
-        .when()
+                .when()
                 .get("/pet/findByStatus")
-        .then()
+                .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
                 .body("", instanceOf(List.class))
