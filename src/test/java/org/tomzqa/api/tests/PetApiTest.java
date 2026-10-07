@@ -2,6 +2,7 @@ package org.tomzqa.api.tests;
 
 import io.restassured.http.ContentType;
 import org.testng.annotations.Test;
+import org.tomzqa.api.support.ApiConfig;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ public class PetApiTest {
     @Test
     public void availablePetsCanBeRetrieved() {
         given()
-                .baseUri("http://localhost:8080/api/v3")
+                .baseUri(ApiConfig.BASE_URI)
                 .accept(ContentType.JSON)
                 .queryParam("status", "available")
                 .when()
