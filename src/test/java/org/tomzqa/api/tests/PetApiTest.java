@@ -30,7 +30,6 @@ public class PetApiTest {
         Response creationResponse = given()
                 .baseUri(ApiConfig.BASE_URI)
                 .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
                 .body(requestBody)
                 .when()
                 .post("/pet")
@@ -47,7 +46,6 @@ public class PetApiTest {
 
         given()
                 .baseUri(ApiConfig.BASE_URI)
-                .accept(ContentType.JSON)
                 .pathParam("petId", createdPetId)
                 .when()
                 .get("/pet/{petId}")
@@ -57,13 +55,28 @@ public class PetApiTest {
                 .body("id", equalTo(createdPetId))
                 .body("name", equalTo(petName))
                 .body("status", equalTo("available"));
+
+        given()
+                .baseUri(ApiConfig.BASE_URI)
+                .pathParam("petId", createdPetId)
+                .when()
+                .delete("/pet/{petId}")
+                .then()
+                .statusCode(200);
+
+        given()
+                .baseUri(ApiConfig.BASE_URI)
+                .pathParam("petId", createdPetId)
+                .when()
+                .get("/pet/{petId}")
+                .then()
+                .statusCode(404);
     }
 
     @Test
     public void availablePetsCanBeRetrieved() {
         given()
                 .baseUri(ApiConfig.BASE_URI)
-                .accept(ContentType.JSON)
                 .queryParam("status", "available")
                 .when()
                 .get("/pet/findByStatus")
