@@ -3,7 +3,6 @@ package org.tomzqa.api.tests;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.tomzqa.api.support.ApiConfig;
 import org.tomzqa.api.support.PetCleanup;
@@ -13,17 +12,14 @@ import java.util.concurrent.ThreadLocalRandom;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
-public class PetGetByIdTest {
+public class PetCreateTest {
     private long petId;
-    private String petName;
 
-    @BeforeMethod
-    public void createPet() {
+    @Test
+    public void petCanBeCreated() {
         petId = 0;
-        petName = "REST Assured Pet";
-
         long requestedPetId = ThreadLocalRandom.current().nextLong(1, Long.MAX_VALUE);
-
+        String petName = "REST Assured Pet";
         String requestBody = """
                 {
                   "id": %d,
@@ -33,7 +29,7 @@ public class PetGetByIdTest {
                 }
                 """.formatted(requestedPetId, petName);
 
-        Response creationResponse = given()
+        Response response = given()
                 .baseUri(ApiConfig.BASE_URI)
                 .contentType(ContentType.JSON)
                 .body(requestBody)
@@ -44,20 +40,11 @@ public class PetGetByIdTest {
                 .extract()
                 .response();
 
-        petId = creationResponse.jsonPath().getLong("id");
-    }
+        petId = response.jsonPath().getLong("id");
 
-    @Test
-    public void petCanBeRetrievedById() {
-        given()
-                .baseUri(ApiConfig.BASE_URI)
-                .pathParam("petId", petId)
-                .when()
-                .get("/pet/{petId}")
-                .then()
-                .statusCode(200)
+        response.then()
                 .contentType(ContentType.JSON)
-                .body("id", equalTo(petId))
+                .body("id", equalTo(requestedPetId))
                 .body("name", equalTo(petName))
                 .body("status", equalTo("available"));
     }
