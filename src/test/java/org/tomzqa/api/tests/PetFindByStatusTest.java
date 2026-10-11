@@ -1,6 +1,7 @@
 package org.tomzqa.api.tests;
 
 import io.restassured.http.ContentType;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.tomzqa.api.support.ApiConfig;
 
@@ -12,17 +13,27 @@ import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.instanceOf;
 
 public class PetFindByStatusTest {
-    @Test
-    public void availablePetsCanBeRetrieved() {
+
+    @Test(dataProvider = "petStatuses")
+    public void petsCanBeRetrievedByStatus(String status) {
         given()
                 .baseUri(ApiConfig.BASE_URI)
-                .queryParam("status", "available")
+                .queryParam("status", status)
                 .when()
                 .get("/pet/findByStatus")
                 .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
                 .body("", instanceOf(List.class))
-                .body("status", everyItem(equalTo("available")));
+                .body("status", everyItem(equalTo(status)));
+    }
+
+    @DataProvider(name = "petStatuses")
+    public Object[][] petStatuses() {
+        return new Object[][]{
+                {"available"},
+                {"pending"},
+                {"sold"}
+        };
     }
 }
