@@ -11,6 +11,8 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.notNullValue;
 
 public class PetCreateTest {
     private long petId;
@@ -47,6 +49,42 @@ public class PetCreateTest {
                 .body("id", equalTo(requestedPetId))
                 .body("name", equalTo(petName))
                 .body("status", equalTo("available"));
+    }
+
+    // Known Petstore defect:
+    // POST /pet returns 500 when id is omitted,
+    // although the OpenAPI schema marks id as optional.
+    // Backend throws NullPointerException while accessing Pet.getId().
+    @Test(enabled = false)
+    public void petCanBeCreatedWithRequiredFieldsOnly() {
+        petId = 0;
+        String petName = "Minimal REST Assured Pet";
+        String photoUrl = "https://example.com/pet.jpg";
+        String requestBody = """
+                {
+                  "name": "%s",
+                  "photoUrls": ["%s"]
+                }
+                """.formatted(petName, photoUrl);
+
+        Response response = given()
+                .baseUri(ApiConfig.BASE_URI)
+                .contentType(ContentType.JSON)
+                .body(requestBody)
+                .when()
+                .post("/pet")
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
+
+        response.then()
+                .contentType(ContentType.JSON)
+                .body("id", notNullValue())
+                .body("name", equalTo(petName))
+                .body("photoUrls", hasItem(photoUrl));
+
+        petId = response.jsonPath().getLong("id");
     }
 
     @AfterMethod(alwaysRun = true)
