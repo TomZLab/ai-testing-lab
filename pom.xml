@@ -19,6 +19,18 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.18.9</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <version>3.0.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
             <version>${selenium.version}</version>
@@ -46,6 +58,41 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>7.26.0</version>
+                <executions>
+                    <execution>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/test/resources/openapi/petstore.json</inputSpec>
+                            <generatorName>java</generatorName>
+                            <library>native</library>
+                            <configOptions>
+                                <serializationLibrary>jackson</serializationLibrary>
+                                <openApiNullable>false</openApiNullable>
+                                <supportUrlQuery>false</supportUrlQuery>
+                                <useJakartaEe>true</useJakartaEe>
+                            </configOptions>
+                            <modelPackage>org.tomzqa.api.models</modelPackage>
+                            <output>${project.build.directory}/generated-test-sources/openapi</output>
+                            <generateModels>true</generateModels>
+                            <generateApis>false</generateApis>
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                            <generateApiDocumentation>false</generateApiDocumentation>
+                            <generateModelDocumentation>false</generateModelDocumentation>
+                            <generateSupportingFiles>false</generateSupportingFiles>
+                            <addCompileSourceRoot>false</addCompileSourceRoot>
+                            <addTestCompileSourceRoot>true</addTestCompileSourceRoot>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
