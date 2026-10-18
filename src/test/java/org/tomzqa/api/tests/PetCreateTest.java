@@ -4,9 +4,11 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
+import org.tomzqa.api.models.Pet;
 import org.tomzqa.api.support.ApiConfig;
 import org.tomzqa.api.support.PetCleanup;
 
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static io.restassured.RestAssured.given;
@@ -22,19 +24,16 @@ public class PetCreateTest {
         petId = 0;
         long requestedPetId = ThreadLocalRandom.current().nextLong(1, Long.MAX_VALUE);
         String petName = "REST Assured Pet";
-        String requestBody = """
-                {
-                  "id": %d,
-                  "name": "%s",
-                  "photoUrls": ["https://example.com/pet.jpg"],
-                  "status": "available"
-                }
-                """.formatted(requestedPetId, petName);
+        Pet pet = new Pet()
+                .id(requestedPetId)
+                .name(petName)
+                .photoUrls(List.of("https://example.com/pet.jpg"))
+                .status(Pet.StatusEnum.AVAILABLE);
 
         Response response = given()
                 .baseUri(ApiConfig.BASE_URI)
                 .contentType(ContentType.JSON)
-                .body(requestBody)
+                .body(pet)
                 .when()
                 .post("/pet")
                 .then()
@@ -60,17 +59,14 @@ public class PetCreateTest {
         petId = 0;
         String petName = "Minimal REST Assured Pet";
         String photoUrl = "https://example.com/pet.jpg";
-        String requestBody = """
-                {
-                  "name": "%s",
-                  "photoUrls": ["%s"]
-                }
-                """.formatted(petName, photoUrl);
+        Pet pet = new Pet()
+                .name(petName)
+                .photoUrls(List.of(photoUrl));
 
         Response response = given()
                 .baseUri(ApiConfig.BASE_URI)
                 .contentType(ContentType.JSON)
-                .body(requestBody)
+                .body(pet)
                 .when()
                 .post("/pet")
                 .then()
