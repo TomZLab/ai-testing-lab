@@ -1,7 +1,6 @@
 package org.tomzqa.api.tests;
 
 import io.restassured.http.ContentType;
-import io.restassured.response.Response;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 import org.tomzqa.api.models.Pet;
@@ -12,6 +11,7 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.notNullValue;
@@ -30,7 +30,7 @@ public class PetCreateTest {
                 .photoUrls(List.of("https://example.com/pet.jpg"))
                 .status(Pet.StatusEnum.AVAILABLE);
 
-        Response response = given()
+        Pet createdPet = given()
                 .baseUri(ApiConfig.BASE_URI)
                 .contentType(ContentType.JSON)
                 .body(pet)
@@ -38,16 +38,15 @@ public class PetCreateTest {
                 .post("/pet")
                 .then()
                 .statusCode(200)
-                .extract()
-                .response();
-
-        petId = response.jsonPath().getLong("id");
-
-        response.then()
                 .contentType(ContentType.JSON)
-                .body("id", equalTo(requestedPetId))
-                .body("name", equalTo(petName))
-                .body("status", equalTo("available"));
+                .extract()
+                .as(Pet.class);
+
+        petId = createdPet.getId();
+
+        assertThat(createdPet.getId(), equalTo(requestedPetId));
+        assertThat(createdPet.getName(), equalTo(petName));
+        assertThat(createdPet.getStatus(), equalTo(Pet.StatusEnum.AVAILABLE));
     }
 
     // Known Petstore defect:
@@ -63,7 +62,7 @@ public class PetCreateTest {
                 .name(petName)
                 .photoUrls(List.of(photoUrl));
 
-        Response response = given()
+        Pet createdPet = given()
                 .baseUri(ApiConfig.BASE_URI)
                 .contentType(ContentType.JSON)
                 .body(pet)
@@ -71,16 +70,15 @@ public class PetCreateTest {
                 .post("/pet")
                 .then()
                 .statusCode(200)
-                .extract()
-                .response();
-
-        response.then()
                 .contentType(ContentType.JSON)
-                .body("id", notNullValue())
-                .body("name", equalTo(petName))
-                .body("photoUrls", hasItem(photoUrl));
+                .extract()
+                .as(Pet.class);
 
-        petId = response.jsonPath().getLong("id");
+        assertThat(createdPet.getId(), notNullValue());
+        assertThat(createdPet.getName(), equalTo(petName));
+        assertThat(createdPet.getPhotoUrls(), hasItem(photoUrl));
+
+        petId = createdPet.getId();
     }
 
     @AfterMethod(alwaysRun = true)
