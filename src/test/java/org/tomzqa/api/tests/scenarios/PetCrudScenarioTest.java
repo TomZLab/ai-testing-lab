@@ -4,12 +4,15 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
+import org.tomzqa.api.models.Pet;
 import org.tomzqa.api.support.ApiConfig;
 import org.tomzqa.api.support.PetCleanup;
 
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 public class PetCrudScenarioTest {
@@ -23,19 +26,16 @@ public class PetCrudScenarioTest {
         petId = 0;
         long requestedPetId = ThreadLocalRandom.current().nextLong(1, Long.MAX_VALUE);
 
-        String createBody = """
-                {
-                  "id": %d,
-                  "name": "%s",
-                  "photoUrls": ["https://example.com/pet.jpg"],
-                  "status": "available"
-                }
-                """.formatted(requestedPetId, PET_NAME);
+        Pet pet = new Pet()
+                .id(requestedPetId)
+                .name(PET_NAME)
+                .photoUrls(List.of("https://example.com/pet.jpg"))
+                .status(Pet.StatusEnum.AVAILABLE);
 
         Response creationResponse = given()
                 .baseUri(ApiConfig.BASE_URI)
                 .contentType(ContentType.JSON)
-                .body(createBody)
+                .body(pet)
                 .when()
                 .post("/pet")
                 .then()
@@ -45,16 +45,19 @@ public class PetCrudScenarioTest {
 
         petId = requestedPetId;
 
-        creationResponse.then()
+        Pet createdPet = creationResponse.then()
                 .contentType(ContentType.JSON)
-                .body("id", equalTo(requestedPetId))
-                .body("name", equalTo(PET_NAME))
-                .body("status", equalTo("available"));
+                .extract()
+                .as(Pet.class);
+
+        assertThat(createdPet.getId(), equalTo(requestedPetId));
+        assertThat(createdPet.getName(), equalTo(PET_NAME));
+        assertThat(createdPet.getStatus(), equalTo(Pet.StatusEnum.AVAILABLE));
     }
 
     @Test(dependsOnMethods = "createPet")
     public void readCreatedPet() {
-        given()
+        Pet returnedPet = given()
                 .baseUri(ApiConfig.BASE_URI)
                 .pathParam("petId", petId)
                 .when()
@@ -62,39 +65,42 @@ public class PetCrudScenarioTest {
                 .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("id", equalTo(petId))
-                .body("name", equalTo(PET_NAME))
-                .body("status", equalTo("available"));
+                .extract()
+                .as(Pet.class);
+
+        assertThat(returnedPet.getId(), equalTo(petId));
+        assertThat(returnedPet.getName(), equalTo(PET_NAME));
+        assertThat(returnedPet.getStatus(), equalTo(Pet.StatusEnum.AVAILABLE));
     }
 
     @Test(dependsOnMethods = "readCreatedPet")
     public void updatePet() {
-        String updateBody = """
-                {
-                  "id": %d,
-                  "name": "%s",
-                  "photoUrls": ["https://example.com/pet.jpg"],
-                  "status": "sold"
-                }
-                """.formatted(petId, UPDATED_PET_NAME);
+        Pet pet = new Pet()
+                .id(petId)
+                .name(UPDATED_PET_NAME)
+                .photoUrls(List.of("https://example.com/pet.jpg"))
+                .status(Pet.StatusEnum.SOLD);
 
-        given()
+        Pet updatedPet = given()
                 .baseUri(ApiConfig.BASE_URI)
                 .contentType(ContentType.JSON)
-                .body(updateBody)
+                .body(pet)
                 .when()
                 .put("/pet")
                 .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("id", equalTo(petId))
-                .body("name", equalTo(UPDATED_PET_NAME))
-                .body("status", equalTo("sold"));
+                .extract()
+                .as(Pet.class);
+
+        assertThat(updatedPet.getId(), equalTo(petId));
+        assertThat(updatedPet.getName(), equalTo(UPDATED_PET_NAME));
+        assertThat(updatedPet.getStatus(), equalTo(Pet.StatusEnum.SOLD));
     }
 
     @Test(dependsOnMethods = "updatePet")
     public void verifyUpdatedPet() {
-        given()
+        Pet retrievedPet = given()
                 .baseUri(ApiConfig.BASE_URI)
                 .pathParam("petId", petId)
                 .when()
@@ -102,9 +108,12 @@ public class PetCrudScenarioTest {
                 .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("id", equalTo(petId))
-                .body("name", equalTo(UPDATED_PET_NAME))
-                .body("status", equalTo("sold"));
+                .extract()
+                .as(Pet.class);
+
+        assertThat(retrievedPet.getId(), equalTo(petId));
+        assertThat(retrievedPet.getName(), equalTo(UPDATED_PET_NAME));
+        assertThat(retrievedPet.getStatus(), equalTo(Pet.StatusEnum.SOLD));
     }
 
     @Test(dependsOnMethods = "verifyUpdatedPet")

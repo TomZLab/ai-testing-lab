@@ -1,16 +1,18 @@
 package org.tomzqa.api.tests;
 
 import io.restassured.http.ContentType;
-import io.restassured.response.Response;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import org.tomzqa.api.models.Pet;
 import org.tomzqa.api.support.ApiConfig;
 import org.tomzqa.api.support.PetCleanup;
 
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 public class PetUpdateTest {
@@ -20,54 +22,51 @@ public class PetUpdateTest {
     public void createPet() {
         petId = 0;
         long requestedPetId = ThreadLocalRandom.current().nextLong(1, Long.MAX_VALUE);
-        String requestBody = """
-                {
-                  "id": %d,
-                  "name": "REST Assured Pet",
-                  "photoUrls": ["https://example.com/pet.jpg"],
-                  "status": "available"
-                }
-                """.formatted(requestedPetId);
+        Pet pet = new Pet()
+                .id(requestedPetId)
+                .name("REST Assured Pet")
+                .photoUrls(List.of("https://example.com/pet.jpg"))
+                .status(Pet.StatusEnum.AVAILABLE);
 
-        Response creationResponse = given()
+        Pet createdPet = given()
                 .baseUri(ApiConfig.BASE_URI)
                 .contentType(ContentType.JSON)
-                .body(requestBody)
+                .body(pet)
                 .when()
                 .post("/pet")
                 .then()
                 .statusCode(200)
                 .extract()
-                .response();
+                .as(Pet.class);
 
-        petId = creationResponse.jsonPath().getLong("id");
+        petId = createdPet.getId();
     }
 
     @Test
     public void petCanBeUpdated() {
-        String requestBody = """
-                {
-                  "id": %d,
-                  "name": "Updated REST Assured Pet",
-                  "photoUrls": ["https://example.com/pet.jpg"],
-                  "status": "sold"
-                }
-                """.formatted(petId);
+        Pet pet = new Pet()
+                .id(petId)
+                .name("Updated REST Assured Pet")
+                .photoUrls(List.of("https://example.com/pet.jpg"))
+                .status(Pet.StatusEnum.SOLD);
 
-        given()
+        Pet returnedPet = given()
                 .baseUri(ApiConfig.BASE_URI)
                 .contentType(ContentType.JSON)
-                .body(requestBody)
+                .body(pet)
                 .when()
                 .put("/pet")
                 .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("id", equalTo(petId))
-                .body("name", equalTo("Updated REST Assured Pet"))
-                .body("status", equalTo("sold"));
+                .extract()
+                .as(Pet.class);
 
-        given()
+        assertThat(returnedPet.getId(), equalTo(petId));
+        assertThat(returnedPet.getName(), equalTo("Updated REST Assured Pet"));
+        assertThat(returnedPet.getStatus(), equalTo(Pet.StatusEnum.SOLD));
+
+        Pet retrievedPet = given()
                 .baseUri(ApiConfig.BASE_URI)
                 .pathParam("petId", petId)
                 .when()
@@ -75,9 +74,12 @@ public class PetUpdateTest {
                 .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("id", equalTo(petId))
-                .body("name", equalTo("Updated REST Assured Pet"))
-                .body("status", equalTo("sold"));
+                .extract()
+                .as(Pet.class);
+
+        assertThat(retrievedPet.getId(), equalTo(petId));
+        assertThat(retrievedPet.getName(), equalTo("Updated REST Assured Pet"));
+        assertThat(retrievedPet.getStatus(), equalTo(Pet.StatusEnum.SOLD));
     }
 
     @AfterMethod(alwaysRun = true)

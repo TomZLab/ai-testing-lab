@@ -1,16 +1,18 @@
 package org.tomzqa.api.tests;
 
 import io.restassured.http.ContentType;
-import io.restassured.response.Response;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import org.tomzqa.api.models.Pet;
 import org.tomzqa.api.support.ApiConfig;
 import org.tomzqa.api.support.PetCleanup;
 
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 public class PetGetByIdTest {
@@ -24,32 +26,29 @@ public class PetGetByIdTest {
 
         long requestedPetId = ThreadLocalRandom.current().nextLong(1, Long.MAX_VALUE);
 
-        String requestBody = """
-                {
-                  "id": %d,
-                  "name": "%s",
-                  "photoUrls": ["https://example.com/pet.jpg"],
-                  "status": "available"
-                }
-                """.formatted(requestedPetId, petName);
+        Pet pet = new Pet()
+                .id(requestedPetId)
+                .name(petName)
+                .photoUrls(List.of("https://example.com/pet.jpg"))
+                .status(Pet.StatusEnum.AVAILABLE);
 
-        Response creationResponse = given()
+        Pet createdPet = given()
                 .baseUri(ApiConfig.BASE_URI)
                 .contentType(ContentType.JSON)
-                .body(requestBody)
+                .body(pet)
                 .when()
                 .post("/pet")
                 .then()
                 .statusCode(200)
                 .extract()
-                .response();
+                .as(Pet.class);
 
-        petId = creationResponse.jsonPath().getLong("id");
+        petId = createdPet.getId();
     }
 
     @Test
     public void petCanBeRetrievedById() {
-        given()
+        Pet returnedPet = given()
                 .baseUri(ApiConfig.BASE_URI)
                 .pathParam("petId", petId)
                 .when()
@@ -57,9 +56,12 @@ public class PetGetByIdTest {
                 .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("id", equalTo(petId))
-                .body("name", equalTo(petName))
-                .body("status", equalTo("available"));
+                .extract()
+                .as(Pet.class);
+
+        assertThat(returnedPet.getId(), equalTo(petId));
+        assertThat(returnedPet.getName(), equalTo(petName));
+        assertThat(returnedPet.getStatus(), equalTo(Pet.StatusEnum.AVAILABLE));
     }
 
     @AfterMethod(alwaysRun = true)

@@ -1,22 +1,24 @@
 package org.tomzqa.api.tests;
 
+import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import org.tomzqa.api.models.Pet;
 import org.tomzqa.api.support.ApiConfig;
 
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.everyItem;
-import static org.hamcrest.Matchers.instanceOf;
 
 public class PetFindByStatusTest {
 
     @Test(dataProvider = "petStatuses")
     public void petsCanBeRetrievedByStatus(String status) {
-        given()
+        List<Pet> pets = given()
                 .baseUri(ApiConfig.BASE_URI)
                 .queryParam("status", status)
                 .when()
@@ -24,8 +26,11 @@ public class PetFindByStatusTest {
                 .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("", instanceOf(List.class))
-                .body("status", everyItem(equalTo(status)));
+                .extract()
+                .as(new TypeRef<List<Pet>>() {});
+
+        assertThat(pets.stream().map(Pet::getStatus).toList(),
+                everyItem(equalTo(Pet.StatusEnum.fromValue(status))));
     }
 
     @DataProvider(name = "petStatuses")
