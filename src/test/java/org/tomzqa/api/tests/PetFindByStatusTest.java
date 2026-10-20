@@ -5,7 +5,7 @@ import io.restassured.http.ContentType;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.tomzqa.api.models.Pet;
-import org.tomzqa.api.support.ApiConfig;
+import org.tomzqa.api.support.ApiRequestSpecs;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ public class PetFindByStatusTest {
     @Test(dataProvider = "petStatuses")
     public void petsCanBeRetrievedByStatus(String status) {
         List<Pet> pets = given()
-                .baseUri(ApiConfig.BASE_URI)
+                .spec(ApiRequestSpecs.base())
                 .queryParam("status", status)
                 .when()
                 .get("/pet/findByStatus")

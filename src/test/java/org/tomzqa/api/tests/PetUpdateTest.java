@@ -5,7 +5,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.tomzqa.api.models.Pet;
-import org.tomzqa.api.support.ApiConfig;
+import org.tomzqa.api.support.ApiRequestSpecs;
 import org.tomzqa.api.support.PetCleanup;
 
 import java.util.List;
@@ -29,8 +29,7 @@ public class PetUpdateTest {
                 .status(Pet.StatusEnum.AVAILABLE);
 
         Pet createdPet = given()
-                .baseUri(ApiConfig.BASE_URI)
-                .contentType(ContentType.JSON)
+                .spec(ApiRequestSpecs.json())
                 .body(pet)
                 .when()
                 .post("/pet")
@@ -51,8 +50,7 @@ public class PetUpdateTest {
                 .status(Pet.StatusEnum.SOLD);
 
         Pet returnedPet = given()
-                .baseUri(ApiConfig.BASE_URI)
-                .contentType(ContentType.JSON)
+                .spec(ApiRequestSpecs.json())
                 .body(pet)
                 .when()
                 .put("/pet")
@@ -67,7 +65,7 @@ public class PetUpdateTest {
         assertThat(returnedPet.getStatus(), equalTo(Pet.StatusEnum.SOLD));
 
         Pet retrievedPet = given()
-                .baseUri(ApiConfig.BASE_URI)
+                .spec(ApiRequestSpecs.base())
                 .pathParam("petId", petId)
                 .when()
                 .get("/pet/{petId}")

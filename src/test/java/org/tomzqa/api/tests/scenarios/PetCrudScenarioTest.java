@@ -5,7 +5,7 @@ import io.restassured.response.Response;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 import org.tomzqa.api.models.Pet;
-import org.tomzqa.api.support.ApiConfig;
+import org.tomzqa.api.support.ApiRequestSpecs;
 import org.tomzqa.api.support.PetCleanup;
 
 import java.util.List;
@@ -33,8 +33,7 @@ public class PetCrudScenarioTest {
                 .status(Pet.StatusEnum.AVAILABLE);
 
         Response creationResponse = given()
-                .baseUri(ApiConfig.BASE_URI)
-                .contentType(ContentType.JSON)
+                .spec(ApiRequestSpecs.json())
                 .body(pet)
                 .when()
                 .post("/pet")
@@ -58,7 +57,7 @@ public class PetCrudScenarioTest {
     @Test(dependsOnMethods = "createPet")
     public void readCreatedPet() {
         Pet returnedPet = given()
-                .baseUri(ApiConfig.BASE_URI)
+                .spec(ApiRequestSpecs.base())
                 .pathParam("petId", petId)
                 .when()
                 .get("/pet/{petId}")
@@ -82,8 +81,7 @@ public class PetCrudScenarioTest {
                 .status(Pet.StatusEnum.SOLD);
 
         Pet updatedPet = given()
-                .baseUri(ApiConfig.BASE_URI)
-                .contentType(ContentType.JSON)
+                .spec(ApiRequestSpecs.json())
                 .body(pet)
                 .when()
                 .put("/pet")
@@ -101,7 +99,7 @@ public class PetCrudScenarioTest {
     @Test(dependsOnMethods = "updatePet")
     public void verifyUpdatedPet() {
         Pet retrievedPet = given()
-                .baseUri(ApiConfig.BASE_URI)
+                .spec(ApiRequestSpecs.base())
                 .pathParam("petId", petId)
                 .when()
                 .get("/pet/{petId}")
@@ -119,7 +117,7 @@ public class PetCrudScenarioTest {
     @Test(dependsOnMethods = "verifyUpdatedPet")
     public void deletePet() {
         given()
-                .baseUri(ApiConfig.BASE_URI)
+                .spec(ApiRequestSpecs.base())
                 .pathParam("petId", petId)
                 .when()
                 .delete("/pet/{petId}")
@@ -130,7 +128,7 @@ public class PetCrudScenarioTest {
     @Test(dependsOnMethods = "deletePet")
     public void verifyPetIsDeleted() {
         given()
-                .baseUri(ApiConfig.BASE_URI)
+                .spec(ApiRequestSpecs.base())
                 .pathParam("petId", petId)
                 .when()
                 .get("/pet/{petId}")

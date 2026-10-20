@@ -7,7 +7,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.tomzqa.api.models.Pet;
 import org.tomzqa.api.models.Tag;
-import org.tomzqa.api.support.ApiConfig;
+import org.tomzqa.api.support.ApiRequestSpecs;
 import org.tomzqa.api.support.PetCleanup;
 
 import java.util.List;
@@ -35,8 +35,7 @@ public class PetFindByTagsTest {
                 .tags(List.of(new Tag().id(1L).name(tagName)));
 
         given()
-                .baseUri(ApiConfig.BASE_URI)
-                .contentType(ContentType.JSON)
+                .spec(ApiRequestSpecs.json())
                 .body(pet)
                 .when()
                 .post("/pet")
@@ -49,7 +48,7 @@ public class PetFindByTagsTest {
     @Test
     public void petCanBeFoundByTag() {
         List<Pet> pets = given()
-                .baseUri(ApiConfig.BASE_URI)
+                .spec(ApiRequestSpecs.base())
                 .queryParam("tags", tagName)
                 .when()
                 .get("/pet/findByTags")
