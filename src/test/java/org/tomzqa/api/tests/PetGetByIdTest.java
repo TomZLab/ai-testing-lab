@@ -1,8 +1,8 @@
 package org.tomzqa.api.tests;
 
 import io.restassured.http.ContentType;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.tomzqa.api.models.Pet;
 import org.tomzqa.api.support.ApiRequestSpecs;
@@ -19,7 +19,7 @@ public class PetGetByIdTest {
     private long petId;
     private String petName;
 
-    @BeforeMethod
+    @BeforeClass
     public void createPet() {
         petId = 0;
         petName = "REST Assured Pet";
@@ -63,7 +63,20 @@ public class PetGetByIdTest {
         assertThat(returnedPet.getStatus(), equalTo(Pet.StatusEnum.AVAILABLE));
     }
 
-    @AfterMethod(alwaysRun = true)
+    @Test
+    public void getNonExistingPetReturnsNotFound() {
+        long nonExistingPetId = 0L;
+
+        given()
+                .spec(ApiRequestSpecs.base())
+                .pathParam("petId", nonExistingPetId)
+                .when()
+                .get("/pet/{petId}")
+                .then()
+                .statusCode(404);
+    }
+
+    @AfterClass(alwaysRun = true)
     public void deletePet() {
         PetCleanup.deletePet(petId);
     }
